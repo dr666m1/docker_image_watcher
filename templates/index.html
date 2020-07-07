@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>myApplication</title>
+    <style type="text/css">
+      .MyApp {
+        color: #434343;
+        font-size: 12px;
+        font-family: "Yu Gothic";
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .figureButton {
+        display: inline;
+        cursor: pointer;
+        margin-right: 5px;
+      }
+      .Card {
+        border-bottom: solid 0.5px #434343;
+        margin-bottom: 20px;
+        width: 95vw;
+      }
+      .ScrollToTop {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        background-color: #028760;
+        color: #ffffff;
+      }
+      iframe {
+        border: none;
+        width: 95vw;
+      }
+      img {
+        height: auto;
+        width: auto;
+        max-height: 500px;
+        max-width: 95vw;
+      }
+    </style>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- https://reactjs.org/docs/cdn-links.html -->
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <!-- https://babeljs.io/docs/en/babel-standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+      class MyApp extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            fileNamesWithQuery: []
+          };
+        }
+        componentDidMount() {
+          this.ws = new WebSocket("ws://localhost:9999/");
+          this.ws.onmessage = function(message){
+            this.setState((state, props) => ({
+              fileNamesWithQuery: [message.data].concat(state.fileNamesWithQuery)
+            }));
+          }.bind(this);
+        }
+        componentWillUnmount() {
+          this.ws.close(); // maybe it is not necessary
+        }
+        render() {
+          return (
+            <div className="MyApp">
+              {this.state.fileNamesWithQuery.map((fname) => <Card fileNameWithQuery={fname} key={fname} />)}
+              <ScrollToTop />
+            </div>
+          );
+        }
+      }
+      class ScrollToTop extends React.Component {
+        _handleClick(e) {
+          window.scrollTo(0, 0);
+        }
+        render() {
+          return (
+            <div className="ScrollToTop" onClick={this._handleClick}>↑</div>
+          )
+        }
+      }
+      class Card extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            visible: true,
+            extension: this.props.fileNameWithQuery.split("?")[0].split(".").slice(-1)[0],
+            filePath: `/static/${this.props.fileNameWithQuery}`,
+            fileName: this.props.fileNameWithQuery.split("?")[0]
+          };
+          this._handleClick = this._handleClick.bind(this);
+        }
+        _handleClick(e) {
+            this.setState((state, props) => ({visible: !state.visible}));
+        }
+        render() {
+          let fig;
+          if (["png", "PNG"].includes(this.state.extension)) {
+            fig = <PngFigure fileNameWithQuery={this.props.fileNameWithQuery} visible={this.state.visible} />;
+          } else if (this.state.extension === "html") {
+            fig = <HtmlFigure fileNameWithQuery={this.props.fileNameWithQuery} visible={this.state.visible}/>;
+          } else {
+            fig = <div>error</div>;
+          }
+          return (
+            <div className="Card">
+              <div onClick={this._handleClick} className="figureButton">{this.state.visible ? "▼" : "▶"}</div>
+              <a href={this.state.filePath} className="figureTitle" target="_brank">{this.state.fileName}</a>
+              {fig}
+            </div>
+          );
+        }
+      }
+      class PngFigure extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            filePath: `/static/${this.props.fileNameWithQuery}`
+          }
+        }
+        render() {
+          if (this.props.visible) {
+            return (<div className="PngFigure"><img src={this.state.filePath} /></div>);
+          } else {
+            return (<div className="PngFigure"></div>);
+          }
+        }
+      }
+      class HtmlFigure extends React.Component {
+        constructor(props) {
+          super(props);
+          this._adjustHeight = this._adjustHeight.bind(this);
+          this.state = {
+            filePath: `/static/${this.props.fileNameWithQuery}`
+          }
+        }
+        _adjustHeight() {
+          const frame = document.getElementById(this.state.filePath);
+          const height = frame.contentWindow.document.body.scrollHeight + 50;
+          frame.style.height = height + 'px';
+        }
+        render() {
+            return (<div className="HtmlFigure">
+              <iframe src={this.state.filePath} id={this.state.filePath} onLoad={this._adjustHeight} style={ {display: this.props.visible ? "" : "none"} } />
+            </div>);
+            // first `{` means javascript, second `{` means object
+            // space is needed to prove it is not jinja syntax
+        }
+      }
+      ReactDOM.render(
+        <MyApp />,
+        document.getElementById("app")
+      )
+    </script>
+  </body>
+</html>

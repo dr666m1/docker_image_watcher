@@ -39,5 +39,3 @@ docker-compose -f $FILE_PATH --project-directory $(pwd) down
 # docker-compose -f $FILE_PATH --project-directory (pwd) down
 ```
 
-# other
-if you want to check the script, see [this repository](https://github.com/dr666m1/docker_image_watcher_websocket) as well.

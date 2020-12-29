@@ -2,40 +2,14 @@
 docker images to show figures instantly.
 
 # usage
-save this script as `docker-compose.yml`.
+run the command below.
 
 ```
-version: "3"
-services:
-  websocket:
-    image: ghcr.io/dr666m1/image_watcher_websocket
-    volumes:
-      - .:/work/sync
-    ports:
-      - "9999:9999"
-  webserver:
-    image: ghcr.io/dr666m1/image_watcher_webserver
-    volumes:
-      - .:/work/sync
-    ports:
-      - "8888:8888"
-    depends_on:
-      - websocket
-```
-
-then run the command below. `$FILE_PATH` means path to `docker-compose.yml`.
-
-```
-docker-compose -f $FILE_PATH --project-directory $(pwd) up -d
+docker container run --rm -it -v $(pwd):/work/sync -p 9999:9999 ghcr.io/dr666m1/image_watcher
 # if you use fish shell
-# docker-compose -f $FILE_PATH --project-directory (pwd) up -d
+# docker container run --rm -it -v (pwd):/work/sync -p 9999:9999 ghcr.io/dr666m1/image_watcher
 ```
 
-to stop the container, run the command below.
+then open `localhost:9999`.
 
-```
-docker-compose -f $FILE_PATH --project-directory $(pwd) down
-# if you use fish shell
-# docker-compose -f $FILE_PATH --project-directory (pwd) down
-```
-
+the figures in the current directory is shown everytime they are changed.

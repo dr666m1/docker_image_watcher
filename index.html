@@ -98,7 +98,6 @@
           this.state = {
             visible: true,
             extension: this.props.fileNameWithQuery.split("?")[0].split(".").slice(-1)[0],
-            filePath: `/static/${this.props.fileNameWithQuery}`,
             fileName: this.props.fileNameWithQuery.split("?")[0]
           };
           this._handleClick = this._handleClick.bind(this);
@@ -118,7 +117,7 @@
           return (
             <div className="Card">
               <div onClick={this._handleClick} className="figureButton">{this.state.visible ? "▼" : "▶"}</div>
-              <a href={this.state.filePath} className="figureTitle" target="_brank">{this.state.fileName}</a>
+              <a href={this.state.fileName} className="figureTitle" target="_brank">{this.state.fileName}</a>
               {fig}
             </div>
           );
@@ -128,7 +127,7 @@
         constructor(props) {
           super(props);
           this.state = {
-            filePath: `/static/${this.props.fileNameWithQuery}`
+            filePath: `/${this.props.fileNameWithQuery}`.replace(/\?.*$/, ""),
           }
         }
         render() {
@@ -144,17 +143,18 @@
           super(props);
           this._adjustHeight = this._adjustHeight.bind(this);
           this.state = {
-            filePath: `/static/${this.props.fileNameWithQuery}`
+            filePath: `/${this.props.fileNameWithQuery}`.replace(/\?.*$/, ""),
+            filePathWithQuery: `/${this.props.fileNameWithQuery}`
           }
         }
         _adjustHeight() {
-          const frame = document.getElementById(this.state.filePath);
+          const frame = document.getElementById(this.state.filePathWithQuery);
           const height = frame.contentWindow.document.body.scrollHeight + 50;
           frame.style.height = height + 'px';
         }
         render() {
             return (<div className="HtmlFigure">
-              <iframe src={this.state.filePath} id={this.state.filePath} onLoad={this._adjustHeight} style={ {display: this.props.visible ? "" : "none"} } />
+              <iframe src={this.state.filePath} id={this.state.filePathWithQuery} onLoad={this._adjustHeight} style={ {display: this.props.visible ? "" : "none"} } />
             </div>);
             // first `{` means javascript, second `{` means object
             // space is needed to prove it is not jinja syntax

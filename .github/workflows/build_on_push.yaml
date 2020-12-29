@@ -30,6 +30,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          context: ./web_socket
-          file: ./web_socket/Dockerfile
-          tags: ghcr.io/dr666m1/image_watcher_websocket:${{ steps.prep.outputs.tag }}
+          context: .
+          file: ./Dockerfile
+          tags: ghcr.io/dr666m1/image_watcher:${{ steps.prep.outputs.tag }}

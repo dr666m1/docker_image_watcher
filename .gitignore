@@ -1,3 +1,5 @@
 sync/
 sync
 venv/
+*png
+node_modules/

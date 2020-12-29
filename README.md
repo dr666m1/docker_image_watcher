@@ -8,13 +8,13 @@ save this script as `docker-compose.yml`.
 version: "3"
 services:
   websocket:
-    image: dr666m1/image_watcher_websocket:version-0.0
+    image: ghcr.io/dr666m1/image_watcher_websocket
     volumes:
       - .:/work/sync
     ports:
       - "9999:9999"
   webserver:
-    image: dr666m1/image_watcher_webserver:version-0.0
+    image: ghcr.io/dr666m1/image_watcher_webserver
     volumes:
       - .:/work/sync
     ports:

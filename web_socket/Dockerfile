@@ -1,13 +1,17 @@
-FROM python:3.8.3
+FROM node:12-alpine
 
 ENV WORK /work
 
 WORKDIR $WORK
 
+COPY ./package*.json ./
+
+RUN npm ci
+
 COPY . .
 
-RUN apt update && \
-    pip install --no-cache-dir -r requirements.txt && \
-    chmod +x entrypoint.sh
+RUN chmod +x entrypoint.sh
+
+EXPOSE 9999
 
 ENTRYPOINT ["./entrypoint.sh"]
